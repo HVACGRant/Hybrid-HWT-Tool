@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DG Diagnostic Tool</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+        margin: 0;
+        padding: 20px;
+    }
+    .tool-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 6px;
+        padding: 16px 20px 24px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    /* Tiny Reset Button */
+    #resetBtn {
+        width: 90px;
+        padding: 4px 6px;
+        font-size: 12px;
+        font-weight: 700;
+        background: #ff4444;
+        color: #fff;
+        border: 2px solid #000;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-bottom: 12px;
+        display: block;
+    }
+
+    .section {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-bottom: 12px;
+        overflow: hidden;
+    }
+    .section-header {
+        background: #ffe680;
+        padding: 8px 10px;
+        font-weight: bold;
+        cursor: pointer;
+        user-select: none;
+    }
+    .section-content {
+        padding: 10px;
+        display: none;
+        background: #fafafa;
+    }
+    .section-content.active {
+        display: flex;
+        gap: 24px;
+    }
+    .section-content.single-col.active {
+        display: block;
+    }
+    .column {
+        flex: 1;
+        min-width: 0;
+    }
+
+    label {
+        display: block;
+        font-size: 13px;
+        margin-top: 6px;
+        margin-bottom: 2px;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+        width: 65px;
+        padding: 2px 4px;
+        font-size: 12px;
+        border: 1px solid #999;
+        border-radius: 3px;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="tool-container">
+
+    <button id="resetBtn" onclick="resetTool()">Reset</button>
+
+    <!-- SECTION 1: TEMPS -->
+    <div class="section" id="section1">
+        <div class="section-header" onclick="toggleSection('section1', true)">Temps</div>
+        <div class="section-content single-col active" id="section1-content">
+            <label>Room Temp</label>
+            <input type="number" id="roomTemp">
+
+            <label>Water Temp</label>
+            <input type="number" id="waterTemp" onkeydown="handleTempsEnter(event)">
+        </div>
+    </div>
+
+    <!-- SECTION 2: THERMISTORS -->
+    <div class="section" id="section2">
+        <div class="section-header" onclick="toggleSection('section2')">Thermistors</div>
+
+        <div class="section-content" id="section2-content">
+
+            <div class="column">
+                <label>DT - Blue</label>
+                <input type="number" id="dt" oninput="validateThermistor('dt',1,160,0)">
+
+                <label>ST - Yellow</label>
+                <input type="number" id="st" oninput="validateThermistor('st',38,90,0)">
+
+                <label>ET - Grey</label>
+                <input type="number" id="et" oninput="validateThermistor('et',5,70,0)">
+
+                <label>AT - White</label>
+                <input type="number" id="at" oninput="validateAT('at')">
+
+                <label>Current</label>
+                <input type="number" id="amps" oninput="validateThermistor('amps',1,1.7,0)">
+            </div>
+
+            <div class="column">
+                <label>DT - Blue</label>
+                <input type="number" id="dt_b" oninput="validateThermistor('dt_b',1,160,0)">
+
+                <label>ST - Yellow</label>
+                <input type="number" id="st_b" oninput="validateThermistor('st_b',38,90,0)">
+
+                <label>ET - Grey</label>
+                <input type="number" id="et_b" oninput="validateThermistor('et_b',5,70,0)">
+
+                <label>AT - White</label>
+                <input type="number" id="at_b" oninput="validateAT('at_b')">
+
+                <label>Current</label>
+                <input type="number" id="amps_b"
+                       oninput="validateThermistor('amps_b',1,1.7,0)"
+                       onkeydown="handleThermLastEnter(event)">
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SECTION 3: HEATING ELEMENTS -->
+    <div class="section" id="section3">
+        <div class="section-header" onclick="toggleSection('section3', true)">Heating Elements</div>
+        <div class="section-content single-col" id="section3-content">
+
+            <label>UT - Upper Temp</label>
+            <input type="number" id="utTemp" oninput="validateUTLT('utTemp')">
+
+            <label>Upper Element Current</label>
+            <input type="number" id="upperElement" oninput="validateElementCurrent('upperElement')">
+
+            <label>LT - Lower Temp</label>
+            <input type="number" id="ltTemp" oninput="validateUTLT('ltTemp')">
+
+            <label>Lower Element Current</label>
+            <input type="number" id="lowerElement"
+                   oninput="validateElementCurrent('lowerElement')"
+                   onkeydown="handleHeatLastEnter(event)">
+        </div>
+    </div>
+
+    <!-- SECTION 4: CAPACITOR -->
+    <div class="section" id="section4">
+        <div class="section-header" onclick="toggleSection('section4', true)">Capacitor</div>
+
+        <div class="section-content single-col" id="section4-content">
+
+            <label>Volts Coming In</label>
+            <input type="number" id="capIn">
+
+            <label>Capacitor Volts</label>
+            <input type="number" id="capVolts" oninput="validateCapacitor()">
+        </div>
+    </div>
+
+    <!-- SECTION 5: COMPRESSOR -->
+    <div class="section" id="section5">
+        <div class="section-header" onclick="toggleSection('section5', true)">Compressor</div>
+
+        <div class="section-content single-col" id="section5-content">
+
+            <label>Yellow → Red</label>
+            <input type="number" id="compYR" oninput="validateCompressor()">
+
+            <label>Yellow → Purple</label>
+            <input type="number" id="compYP" oninput="validateCompressor()">
+
+            <label>Red → Purple</label>
+            <input type="number" id="compRP" oninput="validateCompressor()">
+        </div>
+    </div>
+
+    <!-- SECTION 6: COMPRESSOR TO GROUND -->
+    <div class="section" id="section6">
+        <div class="section-header" onclick="toggleSection('section6', true)">Compressor To Ground</div>
+
+        <div class="section-content single-col" id="section6-content">
+
+            <label>Red → Ground</label>
+            <input type="text" id="compRedG" oninput="validateCompGround('compRedG')">
+
+            <label>Yellow → Ground</label>
+            <input type="text" id="compYelG" oninput="validateCompGround('compYelG')">
+
+            <label>Purple → Ground</label>
+            <input type="text" id="compPurG" oninput="validateCompGround('compPurG')">
+        </div>
+    </div>
+
+    <!-- SECTION 7: EXV -->
+    <div class="section" id="section7">
+        <div class="section-header" onclick="toggleSection('section7', true)">EXV</div>
+
+        <div class="section-content single-col" id="section7-content">
+
+            <label>Orange → Yellow</label>
+            <input type="number" id="exvOY" oninput="validateEXV('exvOY',81.90,99.00)">
+
+            <label>Red → Black</label>
+            <input type="number" id="exvRB" oninput="validateEXV('exvRB',83.70,97.20)">
+
+            <label>Grey → Black</label>
+            <input type="number" id="exvGB" oninput="validateEXV('exvGB',42.80,48.50)">
+
+            <label>Grey → Yellow</label>
+            <input type="number" id="exvGY" oninput="validateEXV('exvGY',46.60,47.50)">
+
+            <label>Grey → Red</label>
+            <input type="number" id="exvGR" oninput="validateEXV('exvGR',41.60,48.50)">
+
+            <label>Grey → Orange</label>
+            <input type="number" id="exvGO" oninput="validateEXV('exvGO',41.90,49.10)">
+        </div>
+    </div>
+
+</div>
+
+<script>
+function toggleSection(sectionId) {
+    const content = document.getElementById(sectionId + '-content');
+    content.classList.toggle('active');
+}
+
+function openSection(sectionId) {
+    const content = document.getElementById(sectionId + '-content');
+    content.classList.add('active');
+}
+
+function resetTool() {
+    const inputs = document.querySelectorAll("input");
+    inputs.forEach(i => { i.value = ""; i.style.background = ""; });
+
+    const sections = document.querySelectorAll(".section-content");
+    sections.forEach(sec => sec.classList.remove("active"));
+
+    document.getElementById("section1-content").classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    document.getElementById("roomTemp").focus();
+}
+
+function handleTempsEnter(e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        openSection('section2');
+        document.getElementById('dt').focus();
+    }
+}
+
+function handleThermLastEnter(e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        openSection('section3');
+        document.getElementById('utTemp').focus();
+    }
+}
+
+function handleHeatLastEnter(e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        openSection('section4');
+        document.getElementById('capIn').focus();
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    document.getElementById("capVolts").addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            openSection('section5');
+            document.getElementById('compYR').focus();
+        }
+    });
+
+    document.getElementById("compRP").addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            openSection('section6');
+            document.getElementById('compRedG').focus();
+        }
+    });
+
+    document.getElementById("compPurG").addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            openSection('section7');
+            document.getElementById('exvOY').focus();
+        }
+    });
+
+    let allInputs = Array.from(document.querySelectorAll("input"));
+    allInputs.forEach((input, i) => {
+        input.addEventListener("keydown", function(e) {
+            if (e.defaultPrevented) return;
+
+            if (e.key === "Enter" || e.key === "ArrowDown") {
+                e.preventDefault();
+                const next = allInputs[i + 1];
+                if (next) { next.focus(); next.select(); }
+            }
+            if (e.key === "ArrowUp") {
+                e.preventDefault();
+                const prev = allInputs[i - 1];
+                if (prev) { prev.focus(); prev.select(); }
+            }
+        });
+    });
+});
+
+function validateThermistor(id,min,max,low) {
+    const el = document.getElementById(id);
+    const v = parseFloat(el.value);
+    if (isNaN(v) || v < low) { el.style.background = ""; return; }
+    el.style.background = (v >= min && v <= max) ? "#c8f7c5" : "#f7c5c5";
+}
+
+function validateAT(id){
+    const room = parseFloat(document.getElementById("roomTemp").value);
+    const el = document.getElementById(id);
+    const v = parseFloat(el.value);
+    if (isNaN(room) || isNaN(v)) { el.style.background = ""; return; }
+    const min = room * 0.92, max = room * 1.08;
+    el.style.background = (v >= min && v <= max) ? "#c8f7c5" : "#f7c5c5";
+}
+
+function validateElementCurrent(id){
+    const el = document.getElementById(id);
+    const v = parseFloat(el.value);
+    if (isNaN(v)) { el.style.background = ""; return; }
+    el.style.background = (v >= 16 && v <= 24) ? "#c8f7c5" : "#f7c5c5";
+}
+
+function validateUTLT(id){
+    const water = parseFloat(document.getElementById("waterTemp").value);
+    const el = document.getElementById(id);
+    const v = parseFloat(el.value);
+    if (isNaN(water) || isNaN(v)) { el.style.background = ""; return; }
+    const min = water * 0.95, max = water * 1.05;
+    el.style.background = (v >= min && v <= max) ? "#c8f7c5" : "#f7c5c5";
+}
+
+function validateCapacitor(){
+    const el = document.getElementById("capVolts");
+    const v = parseFloat(el.value);
+
+    if (isNaN(v)) { 
+        el.style.background = ""; 
+        return; 
+    }
+
+    if (v >= 310 && v <= 400) el.style.background = "#c8f7c5";   // PASS
+    else if (v >= 288 && v <= 309) el.style.background = "#fff7a8"; // LOW
+    else if (v >= 10 && v <= 287) el.style.background = "#f7c5c5";  // FAIL
+    else el.style.background = "";
+}
+
+function validateCompressor(){
+    const yr = parseFloat(document.getElementById("compYR").value);
+    const yp = parseFloat(document.getElementById("compYP").value);
+    const rpEl = document.getElementById("compRP");
+    const rp = parseFloat(rpEl.value);
+    if (isNaN(rp) || isNaN(yr) || isNaN(yp)) { rpEl.style.background = ""; return; }
+    const sum = yr + yp, min = rp * 0.95, max = rp * 1.05;
+    rpEl.style.background = (sum >= min && sum <= max) ? "#c8f7c5" : "#f7c5c5";
+}
+
+function validateCompGround(id){
+    const el = document.getElementById(id);
+    const v = el.value.trim().toUpperCase();
+    if (v === "") { el.style.background = ""; return; }
+    el.style.background = (v === "OL") ? "#c8f7c5" : "#f7c5c5";
+}
+
+function validateEXV(id,min,max){
+    const el = document.getElementById(id);
+    const v = parseFloat(el.value);
+    if (isNaN(v)) { el.style.background = ""; return; }
+    el.style.background = (v >= min && v <= max) ? "#c8f7c5" : "#f7c5c5";
+}
+</script>
+
+</body>
+</html>
