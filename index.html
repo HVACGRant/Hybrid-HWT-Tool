@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>DG Diagnostic Tool</title>
+<title>DG Diagnostic Tool – Technician Edition</title>
 
 <style>
     body {
@@ -18,6 +18,34 @@
         border-radius: 6px;
         padding: 16px 20px 24px;
         box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    /* LOGO + HEADER */
+    .logo-container {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 8px;
+    }
+    .dg-logo {
+        width: 180px;
+        height: auto;
+        display: block;
+        margin: 0 auto 8px auto;
+    }
+    .subtitle {
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        color: #444;
+        margin-bottom: 10px;
+        letter-spacing: 0.5px;
+    }
+    .divider {
+        width: 100%;
+        height: 2px;
+        background: #d0d0d0;
+        margin: 8px 0 14px 0;
+        border-radius: 2px;
     }
 
     /* Tiny Reset Button */
@@ -80,12 +108,101 @@
         border: 1px solid #999;
         border-radius: 3px;
     }
+
+    /* ── Feedback Strip ── */
+    .feedback-card {
+        background: #ffffff;
+        border: 1px solid #d0d4da;
+        border-radius: 10px;
+        width: 100%;
+        max-width: 420px;
+        margin: 1.2rem auto;
+        padding: 1.4rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+    .feedback-card h2 {
+        font-size: 1.05rem;
+        font-weight: 700;
+        margin: 0 0 .15rem;
+    }
+    .feedback-card .fb-sub {
+        font-size: .82rem;
+        color: #6b7280;
+        margin-bottom: 1rem;
+    }
+    .fb-stars {
+        display: flex;
+        gap: .35rem;
+        margin-bottom: 1rem;
+    }
+    .fb-stars span {
+        font-size: 2rem;
+        cursor: pointer;
+        color: #c5cad2;
+        transition: color .15s, transform .15s;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+    .fb-stars span.active { color: #f59e0b; }
+    .fb-stars span:hover  { transform: scale(1.15); }
+    #fbComment {
+        width: 100%;
+        border: 1px solid #d0d4da;
+        border-radius: 6px;
+        padding: .55rem .65rem;
+        font-size: .88rem;
+        font-family: inherit;
+        resize: vertical;
+        min-height: 64px;
+        box-sizing: border-box;
+    }
+    #fbComment:focus {
+        outline: none;
+        border-color: #0078d4;
+        box-shadow: 0 0 0 2px rgba(0,120,212,.15);
+    }
+    .fb-btn-row {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        margin-top: .75rem;
+    }
+    #fbSend {
+        padding: .5rem 1.4rem;
+        border: none;
+        border-radius: 6px;
+        font-size: .88rem;
+        font-weight: 600;
+        cursor: pointer;
+        background: #0078d4;
+        color: #fff;
+    }
+    #fbSend:hover:not(:disabled) { background: #005fa3; }
+    #fbSend:disabled { opacity: .45; cursor: default; }
+    .fb-status { font-size: .82rem; color: #6b7280; }
+    .fb-status.success { color: #16a34a; font-weight: 600; }
+    .fb-status.error   { color: #dc2626; font-weight: 600; }
+    .fb-device {
+        margin-top: 1rem;
+        padding-top: .6rem;
+        border-top: 1px solid #e5e7eb;
+        font-size: .72rem;
+        color: #9ca3af;
+        text-align: center;
+    }
 </style>
 </head>
 
 <body>
 
 <div class="tool-container">
+
+    <!-- LOGO + HEADER -->
+    <div class="logo-container">
+        <img src="DG-LOGO.png" class="dg-logo" alt="DG Logo">
+    </div>
+    <div class="subtitle">Technician Edition</div>
+    <div class="divider"></div>
 
     <button id="resetBtn" onclick="resetTool()">Reset</button>
 
@@ -241,6 +358,22 @@
         </div>
     </div>
 
+    <!-- ── Feedback Strip (hidden until diagnostic completes) ── -->
+    <div class="feedback-card" id="feedbackStrip" style="display:none;">
+        <h2>How did this diagnostic go?</h2>
+        <p class="fb-sub">Your feedback helps improve the tool.</p>
+        <div class="fb-stars" id="fbStars">
+            <span data-v="1">★</span><span data-v="2">★</span>
+            <span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+        </div>
+        <textarea id="fbComment" rows="3" placeholder="Optional comment…"></textarea>
+        <div class="fb-btn-row">
+            <button id="fbSend" disabled>Send Feedback</button>
+            <span class="fb-status" id="fbStatus"></span>
+        </div>
+        <div class="fb-device" id="fbDevice"></div>
+    </div>
+
 </div>
 
 <script>
@@ -262,6 +395,18 @@ function resetTool() {
     sections.forEach(sec => sec.classList.remove("active"));
 
     document.getElementById("section1-content").classList.add("active");
+
+    // Reset feedback strip
+    document.getElementById("feedbackStrip").style.display = "none";
+    document.getElementById("fbStatus").textContent = "";
+    document.getElementById("fbStatus").className = "fb-status";
+    document.getElementById("fbComment").value = "";
+    document.getElementById("fbSend").disabled = true;
+    document.querySelectorAll("#fbStars span").forEach(function(s) {
+        s.classList.remove("active");
+    });
+    selectedRating = 0;
+
     window.scrollTo({ top: 0, behavior: "smooth" });
     document.getElementById("roomTemp").focus();
 }
@@ -313,6 +458,15 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             openSection('section7');
             document.getElementById('exvOY').focus();
+        }
+    });
+
+    // Last EXV field — show feedback strip on Enter
+    document.getElementById("exvGO").addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            document.getElementById("feedbackStrip").style.display = "block";
+            document.getElementById("feedbackStrip").scrollIntoView({ behavior: "smooth" });
         }
     });
 
@@ -376,9 +530,9 @@ function validateCapacitor(){
         return; 
     }
 
-    if (v >= 310 && v <= 400) el.style.background = "#c8f7c5";   // PASS
-    else if (v >= 288 && v <= 309) el.style.background = "#fff7a8"; // LOW
-    else if (v >= 10 && v <= 287) el.style.background = "#f7c5c5";  // FAIL
+    if (v >= 310 && v <= 400) el.style.background = "#c8f7c5";
+    else if (v >= 288 && v <= 309) el.style.background = "#fff7a8";
+    else if (v >= 10 && v <= 287) el.style.background = "#f7c5c5";
     else el.style.background = "";
 }
 
@@ -405,7 +559,83 @@ function validateEXV(id,min,max){
     if (isNaN(v)) { el.style.background = ""; return; }
     el.style.background = (v >= min && v <= max) ? "#c8f7c5" : "#f7c5c5";
 }
+
+// ═══════════════════════════════════════════
+// FEEDBACK — Google Sheets auto-collection
+// ═══════════════════════════════════════════
+var selectedRating = 0;
+
+(function () {
+    var FEEDBACK_URL =
+        'https://script.google.com/macros/s/AKfycbyHb-rUHlHOI29xAWJSIa5VBoEK-aEy8mzzWQJXg7F9w1jlmKVN5udxAXPEsoTmnEIR/exec';
+
+    function getDeviceInfo() {
+        var ua = navigator.userAgent;
+        var platform = /iPad/.test(ua) ? 'iPad'
+            : /iPhone/.test(ua) ? 'iPhone'
+            : /Android/.test(ua) ? 'Android'
+            : 'Desktop';
+        var browser = /Chrome\/(\d+)/.test(ua) ? 'Chrome ' + RegExp.$1
+            : /Safari\//.test(ua) ? 'Safari'
+            : /Firefox\/(\d+)/.test(ua) ? 'Firefox ' + RegExp.$1
+            : 'Other';
+        return platform + ' / ' + browser + ' / ' + navigator.platform;
+    }
+
+    async function submitFeedback(rating, comment) {
+        var payload = {
+            rating:     rating,
+            comment:    comment,
+            timestamp:  new Date().toISOString(),
+            deviceInfo: getDeviceInfo()
+        };
+        try {
+            var res = await fetch(FEEDBACK_URL, {
+                method:  'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body:    JSON.stringify(payload)
+            });
+            return res.ok || res.type === 'opaque';
+        } catch (err) {
+            console.error('Feedback error:', err);
+            return false;
+        }
+    }
+
+    // ── Star rating wiring ──
+    var stars   = document.querySelectorAll('#fbStars span');
+    var sendBtn = document.getElementById('fbSend');
+    var status  = document.getElementById('fbStatus');
+
+    stars.forEach(function (s) {
+        s.addEventListener('click', function () {
+            selectedRating = +s.dataset.v;
+            stars.forEach(function (st) {
+                st.classList.toggle('active', +st.dataset.v <= selectedRating);
+            });
+            sendBtn.disabled = false;
+        });
+    });
+
+    sendBtn.addEventListener('click', async function () {
+        sendBtn.disabled   = true;
+        status.textContent = 'Sending…';
+        status.className   = 'fb-status';
+
+        var ok = await submitFeedback(
+            selectedRating,
+            document.getElementById('fbComment').value.trim() || '(no comment)'
+        );
+        status.textContent = ok ? '✓ Thanks!' : '✗ Failed — try again';
+        status.className   = 'fb-status ' + (ok ? 'success' : 'error');
+        if (!ok) sendBtn.disabled = false;
+    });
+
+    // ── Show device info in footer ──
+    document.getElementById('fbDevice').textContent = getDeviceInfo();
+})();
 </script>
 
 </body>
 </html>
+    
