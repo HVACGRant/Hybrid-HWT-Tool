@@ -2,565 +2,444 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>G's Flowers Inventory</title>
+<title>DG Diagnostic Tool – Technician Edition</title>
 
 <style>
     body {
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
         margin: 0;
-        padding: 0;
-        font-family: "Playfair Display", serif;
-        background: linear-gradient(to bottom, #EFA3B3, #D96A7B, #B84F63);
-        color: #FCE8EB;
-        overflow-x: hidden;
-    }
-
-    /* ---------------- COVER SHEET ---------------- */
-
-    #coverSheet {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: inherit;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-        padding: 80px 20px;
-        text-align: center;
-        z-index: 9999;
-        transition: opacity 0.8s ease;
-    }
-
-    .cover-text {
-        font-weight: 700;
-        color: #FCE8EB;
-    }
-
-    .top-name {
-        font-size: 2.5rem;
-    }
-
-    .top-name span {
-        font-size: 5rem; /* Double-size G */
-    }
-
-    .middle-name {
-        font-size: 4rem; /* Double-size whole line */
-    }
-
-    .middle-name span {
-        font-size: 7rem; /* Triple-size G */
-    }
-
-    .bottom-name {
-        font-size: 2.5rem;
-    }
-
-    .bottom-name span {
-        font-size: 5rem; /* Double-size G */
-    }
-
-    #nextBtn {
-        margin-bottom: 40px;
-        padding: 12px 28px;
-        background: #8A2F45;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 1.4rem;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-
-    #nextBtn:hover {
-        background: #B84F63;
-    }
-
-    /* ---------------- INVENTORY PAGE ---------------- */
-
-    #inventoryPage {
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.8s ease;
         padding: 20px;
     }
-
-    h1 {
-        text-align: center;
-        margin-bottom: 20px;
-        font-size: 3rem;
-        font-weight: 700;
+    .tool-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 6px;
+        padding: 16px 20px 24px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
 
-    table {
+    /* LOGO + HEADER */
+    .logo-container {
         width: 100%;
-        border-collapse: collapse;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 8px;
+    }
+    .dg-logo {
+        width: 180px;
+        height: auto;
+        display: block;
+        margin: 0 auto 8px auto;
+    }
+    .subtitle {
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        color: #444;
+        margin-bottom: 10px;
+        letter-spacing: 0.5px;
+    }
+    .divider {
+        width: 100%;
+        height: 2px;
+        background: #d0d0d0;
+        margin: 8px 0 14px 0;
+        border-radius: 2px;
+    }
+
+    /* Tiny Reset Button */
+    #resetBtn {
+        width: 90px;
+        padding: 4px 6px;
+        font-size: 12px;
+        font-weight: 700;
+        background: #ff4444;
+        color: #fff;
+        border: 2px solid #000;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-bottom: 12px;
+        display: block;
+    }
+
+    .section {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-bottom: 12px;
         overflow: hidden;
     }
-
-    th, td {
-        padding: 12px;
-        padding-right: 20px;
-        text-align: left;
-        font-size: 1.2rem;
-    }
-
-    th:nth-child(3), td:nth-child(3) {
-        width: 40%;
-    }
-
-    th:nth-child(4), td:nth-child(4) {
-        width: 140px;
-    }
-
-    th {
-        background: rgba(255, 255, 255, 0.2);
-        font-weight: 700;
-    }
-
-    tr:nth-child(even) {
-        background: rgba(255, 255, 255, 0.08);
-    }
-
-    tr:nth-child(odd) {
-        background: rgba(255, 255, 255, 0.04);
-    }
-
-    input {
-        width: 100%;
-        padding: 6px;
-        font-size: 1rem;
-        border: none;
-        border-radius: 6px;
-        outline: none;
-    }
-
-    .small-input {
-        width: 70px;
-    }
-
-    .description-wrapper {
-        position: relative;
-        padding-right: 12px;
-    }
-
-    .description-input {
-        width: 100%;
-        padding-right: 28px;
-        white-space: normal;
-        overflow-wrap: break-word;
-        word-wrap: break-word;
-    }
-
-    .notes-icon {
-        position: absolute;
-        right: 6px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 16px;
-        opacity: 0.5;
+    .section-header {
+        background: #ffe680;
+        padding: 8px 10px;
+        font-weight: bold;
         cursor: pointer;
-        transition: 0.2s;
+        user-select: none;
     }
-
-    .notes-icon.active {
-        color: #8A2F45;
-        opacity: 1;
-    }
-
-    .toggle {
-        width: 60px;
-        height: 30px;
-        position: relative;
-        display: inline-block;
-    }
-
-    .toggle input {
+    .section-content {
+        padding: 10px;
         display: none;
+        background: #fafafa;
+    }
+    .section-content.active {
+        display: flex;
+        gap: 24px;
+    }
+    .section-content.single-col.active {
+        display: block;
+    }
+    .column {
+        flex: 1;
+        min-width: 0;
     }
 
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        background-color: #ccc;
-        border-radius: 30px;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        transition: .3s;
+    label {
+        display: block;
+        font-size: 13px;
+        margin-top: 6px;
+        margin-bottom: 2px;
     }
 
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 24px;
-        width: 24px;
-        left: 3px;
-        bottom: 3px;
-        background-color: white;
-        border-radius: 50%;
-        transition: .3s;
+    input[type="number"],
+    input[type="text"] {
+        width: 65px;
+        padding: 2px 4px;
+        font-size: 12px;
+        border: 1px solid #999;
+        border-radius: 3px;
     }
-
-    input:checked + .slider {
-        background-color: #8A2F45;
-    }
-
-    input:checked + .slider:before {
-        transform: translateX(30px);
-    }
-
-    #resetPageBtn {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 8px 14px;
-        background: #ff4444;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 700;
-    }
-
-    .sold-row {
-        background: rgba(255, 255, 255, 0.25) !important;
-        transition: 0.25s;
-    }
-
-    .sold-badge {
-        display: inline-block;
-        padding: 4px 10px;
-        background: #8A2F45;
-        color: white;
-        font-size: 0.9rem;
-        font-weight: 700;
-        border-radius: 6px;
-        margin-left: 10px;
-        opacity: 0;
-        transform: translateY(-2px);
-        transition: 0.25s ease;
-    }
-
-    .sold-row .sold-badge {
-        opacity: 1;
-    }
-
-    /* ---------------- FOOTER ---------------- */
-
-    #footerSignature {
-        text-align: center;
-        margin-top: 30px;
-        font-size: 1.2rem;
-        opacity: 0.7;
-        letter-spacing: 1px;
-    }
-
 </style>
 </head>
+
 <body>
 
-<!-- ---------------- COVER SHEET ---------------- -->
+<div class="tool-container">
 
-<div id="coverSheet">
+    <!-- LOGO + HEADER -->
+    <div class="logo-container">
+        <img src="DG-LOGO.png" class="dg-logo" alt="DG Logo">
+    </div>
+    <div class="subtitle">Technician Edition</div>
+    <div class="divider"></div>
 
-    <div class="cover-text top-name">
-        <span>G</span>aby
+    <button id="resetBtn" onclick="resetTool()">Reset</button>
+
+    <!-- SECTION 1: TEMPS -->
+    <div class="section" id="section1">
+        <div class="section-header" onclick="toggleSection('section1', true)">Temps</div>
+        <div class="section-content single-col active" id="section1-content">
+            <label>Room Temp</label>
+            <input type="number" id="roomTemp">
+
+            <label>Water Temp</label>
+            <input type="number" id="waterTemp" onkeydown="handleTempsEnter(event)">
+        </div>
     </div>
 
-    <div class="cover-text middle-name">
-        <span>G</span>'s Flowers
+    <!-- SECTION 2: THERMISTORS -->
+    <div class="section" id="section2">
+        <div class="section-header" onclick="toggleSection('section2')">Thermistors</div>
+
+        <div class="section-content" id="section2-content">
+
+            <div class="column">
+                <label>DT - Blue</label>
+                <input type="number" id="dt" oninput="validateThermistor('dt',1,160,0)">
+
+                <label>ST - Yellow</label>
+                <input type="number" id="st" oninput="validateThermistor('st',38,90,0)">
+
+                <label>ET - Grey</label>
+                <input type="number" id="et" oninput="validateThermistor('et',5,70,0)">
+
+                <label>AT - White</label>
+                <input type="number" id="at" oninput="validateAT('at')">
+
+                <label>Current</label>
+                <input type="number" id="amps" oninput="validateThermistor('amps',1,1.7,0)">
+            </div>
+
+            <div class="column">
+                <label>DT - Blue</label>
+                <input type="number" id="dt_b" oninput="validateThermistor('dt_b',1,160,0)">
+
+                <label>ST - Yellow</label>
+                <input type="number" id="st_b" oninput="validateThermistor('st_b',38,90,0)">
+
+                <label>ET - Grey</label>
+                <input type="number" id="et_b" oninput="validateThermistor('et_b',5,70,0)">
+
+                <label>AT - White</label>
+                <input type="number" id="at_b" oninput="validateAT('at_b')">
+
+                <label>Current</label>
+                <input type="number" id="amps_b"
+                       oninput="validateThermistor('amps_b',1,1.7,0)"
+                       onkeydown="handleThermLastEnter(event)">
+            </div>
+
+        </div>
     </div>
 
-    <div class="cover-text bottom-name">
-        <span>G</span>inger
+    <!-- SECTION 3: HEATING ELEMENTS -->
+    <div class="section" id="section3">
+        <div class="section-header" onclick="toggleSection('section3', true)">Heating Elements</div>
+        <div class="section-content single-col" id="section3-content">
+
+            <label>UT - Upper Temp</label>
+            <input type="number" id="utTemp" oninput="validateUTLT('utTemp')">
+
+            <label>Upper Element Current</label>
+            <input type="number" id="upperElement" oninput="validateElementCurrent('upperElement')">
+
+            <label>LT - Lower Temp</label>
+            <input type="number" id="ltTemp" oninput="validateUTLT('ltTemp')">
+
+            <label>Lower Element Current</label>
+            <input type="number" id="lowerElement"
+                   oninput="validateElementCurrent('lowerElement')"
+                   onkeydown="handleHeatLastEnter(event)">
+        </div>
     </div>
 
-    <button id="nextBtn">Next</button>
-</div>
+    <!-- SECTION 4: CAPACITOR -->
+    <div class="section" id="section4">
+        <div class="section-header" onclick="toggleSection('section4', true)">Capacitor</div>
 
-<!-- ---------------- INVENTORY PAGE ---------------- -->
+        <div class="section-content single-col" id="section4-content">
 
-<div id="inventoryPage">
+            <label>Volts Coming In</label>
+            <input type="number" id="capIn">
 
-<button id="resetPageBtn">Reset Page</button>
-
-<h1>Inventory</h1>
-
-<table id="inventoryTable">
-    <tr>
-        <th>Name</th>
-        <th>Quantity</th>
-        <th>Description</th>
-        <th>Price</th>
-        <th>Sold</th>
-        <th>Inventory Cost</th>
-        <th>Profit</th>
-        <th></th>
-    </tr>
-</table>
-
-<div id="footerSignature">Designed by Danny</div>
-
-</div>
-
-<!-- ---------------- NOTES POPUP ---------------- -->
-
-<div id="notesPopup" 
-     style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);
-            background:white; padding:20px; border-radius:12px; width:300px; height:240px;
-            box-shadow:0 0 20px rgba(0,0,0,0.3); z-index:9999;">
-
-    <h3 style="margin-top:0; color:#8A2F45;">Notes</h3>
-
-    <textarea id="notesArea" 
-              style="width:100%; height:120px; resize:none; font-size:1rem;"></textarea>
-
-    <div style="display:flex; justify-content:space-between; margin-top:10px;">
-        <button id="deleteNotes" 
-                style="padding:6px 12px; background:#B84F63; color:white;
-                       border:none; border-radius:6px; cursor:pointer;">
-            Delete Notes
-        </button>
-
-        <button id="closeNotes" 
-                style="padding:6px 12px; background:#8A2F45; color:white;
-                       border:none; border-radius:6px; cursor:pointer;">
-            Close
-        </button>
+            <label>Capacitor Volts</label>
+            <input type="number" id="capVolts" oninput="validateCapacitor()">
+        </div>
     </div>
+
+    <!-- SECTION 5: COMPRESSOR -->
+    <div class="section" id="section5">
+        <div class="section-header" onclick="toggleSection('section5', true)">Compressor</div>
+
+        <div class="section-content single-col" id="section5-content">
+
+            <label>Yellow → Red</label>
+            <input type="number" id="compYR" oninput="validateCompressor()">
+
+            <label>Yellow → Purple</label>
+            <input type="number" id="compYP" oninput="validateCompressor()">
+
+            <label>Red → Purple</label>
+            <input type="number" id="compRP" oninput="validateCompressor()">
+        </div>
+    </div>
+
+    <!-- SECTION 6: COMPRESSOR TO GROUND -->
+    <div class="section" id="section6">
+        <div class="section-header" onclick="toggleSection('section6', true)">Compressor To Ground</div>
+
+        <div class="section-content single-col" id="section6-content">
+
+            <label>Red → Ground</label>
+            <input type="text" id="compRedG" oninput="validateCompGround('compRedG')">
+
+            <label>Yellow → Ground</label>
+            <input type="text" id="compYelG" oninput="validateCompGround('compYelG')">
+
+            <label>Purple → Ground</label>
+            <input type="text" id="compPurG" oninput="validateCompGround('compPurG')">
+        </div>
+    </div>
+
+    <!-- SECTION 7: EXV -->
+    <div class="section" id="section7">
+        <div class="section-header" onclick="toggleSection('section7', true)">EXV</div>
+
+        <div class="section-content single-col" id="section7-content">
+
+            <label>Orange → Yellow</label>
+            <input type="number" id="exvOY" oninput="validateEXV('exvOY',81.90,99.00)">
+
+            <label>Red → Black</label>
+            <input type="number" id="exvRB" oninput="validateEXV('exvRB',83.70,97.20)">
+
+            <label>Grey → Black</label>
+            <input type="number" id="exvGB" oninput="validateEXV('exvGB',42.80,48.50)">
+
+            <label>Grey → Yellow</label>
+            <input type="number" id="exvGY" oninput="validateEXV('exvGY',46.60,47.50)">
+
+            <label>Grey → Red</label>
+            <input type="number" id="exvGR" oninput="validateEXV('exvGR',41.60,48.50)">
+
+            <label>Grey → Orange</label>
+            <input type="number" id="exvGO" oninput="validateEXV('exvGO',41.90,49.10)">
+        </div>
+    </div>
+
 </div>
 
 <script>
+function toggleSection(sectionId) {
+    const content = document.getElementById(sectionId + '-content');
+    content.classList.toggle('active');
+}
 
-/* ---------------- COVER SHEET TRANSITION ---------------- */
+function openSection(sectionId) {
+    const content = document.getElementById(sectionId + '-content');
+    content.classList.add('active');
+}
 
-document.getElementById("nextBtn").addEventListener("click", function() {
-    const cover = document.getElementById("coverSheet");
-    const page = document.getElementById("inventoryPage");
+function resetTool() {
+    const inputs = document.querySelectorAll("input");
+    inputs.forEach(i => { i.value = ""; i.style.background = ""; });
 
-    cover.style.opacity = "0";
-    setTimeout(() => {
-        cover.style.display = "none";
-        page.style.opacity = "1";
-        page.style.pointerEvents = "auto";
-    }, 800);
-});
+    const sections = document.querySelectorAll(".section-content");
+    sections.forEach(sec => sec.classList.remove("active"));
 
-/* ---------------- GLOBAL for Notes Fix ---------------- */
-let activeNotesInput = null;
+    document.getElementById("section1-content").classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    document.getElementById("roomTemp").focus();
+}
 
-/* ---------------- AUTO-SAVE FUNCTION ---------------- */
-function saveData() {
-    const rows = [];
-    document.querySelectorAll("#inventoryTable tr").forEach((tr, index) => {
-        if (index === 0) return;
+function handleTempsEnter(e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        openSection('section2');
+        document.getElementById('dt').focus();
+    }
+}
 
-        const cells = tr.querySelectorAll("td");
-        if (cells.length === 0) return;
+function handleThermLastEnter(e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        openSection('section3');
+        document.getElementById('utTemp').focus();
+    }
+}
 
-        rows.push({
-            name: cells[0].querySelector("input")?.value || "",
-            quantity: cells[1].querySelector("input")?.value || "",
-            description: cells[2].querySelector("input")?.value || "",
-            price: cells[3].querySelector("input")?.value || "",
-            sold: cells[4].querySelector("input")?.checked || false,
-            inventoryCost: cells[5].querySelector("input")?.value || "",
-            profit: cells[6].querySelector("input")?.value || ""
-        });
+function handleHeatLastEnter(e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        openSection('section4');
+        document.getElementById('capIn').focus();
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    document.getElementById("capVolts").addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            openSection('section5');
+            document.getElementById('compYR').focus();
+        }
     });
 
-    localStorage.setItem("inventoryData", JSON.stringify(rows));
-}
-
-/* ---------------- ADD ROW FUNCTION ---------------- */
-function addRow(data = {}) {
-    const table = document.getElementById("inventoryTable");
-    const newRow = table.insertRow(-1);
-
-    newRow.innerHTML = `
-        <td><input type="text" value="${data.name || ""}"></td>
-        <td><input type="number" class="small-input quantity" value="${data.quantity || ""}"></td>
-        <td>
-            <div class="description-wrapper">
-                <input type="text" class="description-input" value="${data.description || ""}">
-                <span class="notes-icon">📝</span>
-            </div>
-        </td>
-        <td><input type="number" step="0.01" class="small-input price" value="${data.price || ""}"></td>
-        <td>
-            <label class="toggle">
-                <input type="checkbox" class="sold-toggle" ${data.sold ? "checked" : ""}>
-                <span class="slider"></span>
-            </label>
-        </td>
-        <td><input type="text" class="small-input inventory-cost" readonly value="${data.inventoryCost || "0.00"}"></td>
-        <td><input type="text" class="small-input profit" readonly value="${data.profit || "0.00"}"></td>
-        <td class="sold-badge-cell">
-            <span class="sold-badge">SOLD</span>
-        </td>
-    `;
-
-    if (data.sold) {
-        newRow.classList.add("sold-row");
-        newRow.querySelector(".sold-badge").style.opacity = "1";
-    }
-}
-
-/* ---------------- AUTO-LOAD FUNCTION ---------------- */
-function loadData() {
-    const saved = localStorage.getItem("inventoryData");
-
-    if (saved) {
-        const rows = JSON.parse(saved);
-        rows.forEach(data => addRow(data));
-    }
-
-    if (!saved || JSON.parse(saved).length === 0) {
-        addRow();
-    }
-}
-
-/* ---------------- INITIAL LOAD ---------------- */
-loadData();
-
-/* ---------------- NAVIGATION LOGIC ---------------- */
-document.getElementById("inventoryTable").addEventListener("keydown", function(e) {
-    const currentInput = e.target;
-    if (!currentInput.closest("tr")) return;
-
-    const row = currentInput.closest("tr");
-
-    const inputs = Array.from(
-        row.querySelectorAll("input:not([readonly]):not(.sold-toggle)")
-    );
-
-    const index = inputs.indexOf(currentInput);
-    const lastInput = inputs[inputs.length - 1];
-
-    if (e.key === "Enter" || e.key === "Tab") {
-        e.preventDefault();
-
-        if (currentInput === lastInput) {
-            addRow();
-            saveData();
-            const lastRow = document.querySelectorAll("#inventoryTable tr");
-            lastRow[lastRow.length - 1].querySelector("input").focus();
-        } else {
-            inputs[index + 1].focus();
+    document.getElementById("compRP").addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            openSection('section6');
+            document.getElementById('compRedG').focus();
         }
-    }
+    });
 
-    if (e.key === "ArrowDown") {
-        e.preventDefault();
-        const nextRow = row.nextElementSibling;
-        if (nextRow) {
-            const nextInputs = Array.from(
-                nextRow.querySelectorAll("input:not([readonly]):not(.sold-toggle)")
-            );
-            if (nextInputs[index]) nextInputs[index].focus();
+    document.getElementById("compPurG").addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            openSection('section7');
+            document.getElementById('exvOY').focus();
         }
-    }
+    });
 
-    if (e.key === "ArrowUp") {
-        e.preventDefault();
-        const prevRow = row.previousElementSibling;
-        if (prevRow && prevRow.rowIndex > 0) {
-            const prevInputs = Array.from(
-                prevRow.querySelectorAll("input:not([readonly]):not(.sold-toggle)")
-            );
-            if (prevInputs[index]) prevInputs[index].focus();
-        }
-    }
-});
+    let allInputs = Array.from(document.querySelectorAll("input"));
+    allInputs.forEach((input, i) => {
+        input.addEventListener("keydown", function(e) {
+            if (e.defaultPrevented) return;
 
-/* ---------------- AUTO-CALC + HIGHLIGHT + BADGE ---------------- */
-document.getElementById("inventoryTable").addEventListener("input", function(e) {
-    const row = e.target.closest("tr");
-    if (!row) return;
-
-    const price = parseFloat(row.querySelector(".price")?.value || 0);
-    const quantity = parseFloat(row.querySelector(".quantity")?.value || 0);
-    const sold = row.querySelector(".sold-toggle")?.checked;
-
-    const inventoryCost = row.querySelector(".inventory-cost");
-    const profit = row.querySelector(".profit");
-    const badge = row.querySelector(".sold-badge");
-
-    if (sold) {
-        profit.value = (price * quantity).toFixed(2);
-        inventoryCost.value = "0.00";
-        row.classList.add("sold-row");
-        badge.style.opacity = "1";
-    } else {
-        inventoryCost.value = (price * quantity).toFixed(2);
-        profit.value = "0.00";
-        row.classList.remove("sold-row");
-        badge.style.opacity = "0";
-    }
-
-    saveData();
-});
-
-/* ---------------- NOTES POPUP ---------------- */
-document.addEventListener("click", function(e) {
-    if (e.target.classList.contains("notes-icon")) {
-        const wrapper = e.target.closest(".description-wrapper");
-        const input = wrapper.querySelector(".description-input");
-
-        activeNotesInput = input;
-
-        document.getElementById("notesArea").value = input.value;
-
-        const popup = document.getElementById("notesPopup");
-        popup.style.display = "block";
-    }
-});
-
-document.getElementById("closeNotes").addEventListener("click", function() {
-    if (activeNotesInput) {
-        activeNotesInput.value = document.getElementById("notesArea").value;
-
-        const icon = activeNotesInput.closest(".description-wrapper").querySelector(".notes-icon");
-        if (activeNotesInput.value.trim() !== "") {
-            icon.classList.add("active");
-        } else {
-            icon.classList.remove("active");
-        }
-    }
-
-    document.getElementById("notesPopup").style.display = "none";
-    saveData();
-});
-
-document.getElementById("deleteNotes").addEventListener("click", function() {
-    if (activeNotesInput) {
-        activeNotesInput.value = "";
-        document.getElementById("notesArea").value = "";
-
-        const icon = activeNotesInput.closest(".description-wrapper").querySelector(".notes-icon");
-        icon.classList.remove("active");
-    }
-
-    saveData();
-});
-
-/* ---------------- RESET-BUT-SAVE ---------------- */
-document.getElementById("resetPageBtn").addEventListener("click", function() {
-    if (confirm("Clear the table but keep saved data?")) {
-        const rows = document.querySelectorAll("#inventoryTable tr");
-        rows.forEach((row, index) => {
-            if (index > 0) row.remove();
+            if (e.key === "Enter" || e.key === "ArrowDown") {
+                e.preventDefault();
+                const next = allInputs[i + 1];
+                if (next) { next.focus(); next.select(); }
+            }
+            if (e.key === "ArrowUp") {
+                e.preventDefault();
+                const prev = allInputs[i - 1];
+                if (prev) { prev.focus(); prev.select(); }
+            }
         });
-        addRow();
-    }
+    });
 });
 
+function validateThermistor(id,min,max,low) {
+    const el = document.getElementById(id);
+    const v = parseFloat(el.value);
+    if (isNaN(v) || v < low) { el.style.background = ""; return; }
+    el.style.background = (v >= min && v <= max) ? "#c8f7c5" : "#f7c5c5";
+}
+
+function validateAT(id){
+    const room = parseFloat(document.getElementById("roomTemp").value);
+    const el = document.getElementById(id);
+    const v = parseFloat(el.value);
+    if (isNaN(room) || isNaN(v)) { el.style.background = ""; return; }
+    const min = room * 0.92, max = room * 1.08;
+    el.style.background = (v >= min && v <= max) ? "#c8f7c5" : "#f7c5c5";
+}
+
+function validateElementCurrent(id){
+    const el = document.getElementById(id);
+    const v = parseFloat(el.value);
+    if (isNaN(v)) { el.style.background = ""; return; }
+    el.style.background = (v >= 16 && v <= 24) ? "#c8f7c5" : "#f7c5c5";
+}
+
+function validateUTLT(id){
+    const water = parseFloat(document.getElementById("waterTemp").value);
+    const el = document.getElementById(id);
+    const v = parseFloat(el.value);
+    if (isNaN(water) || isNaN(v)) { el.style.background = ""; return; }
+    const min = water * 0.95, max = water * 1.05;
+    el.style.background = (v >= min && v <= max) ? "#c8f7c5" : "#f7c5c5";
+}
+
+function validateCapacitor(){
+    const el = document.getElementById("capVolts");
+    const v = parseFloat(el.value);
+
+    if (isNaN(v)) { 
+        el.style.background = ""; 
+        return; 
+    }
+
+    if (v >= 310 && v <= 400) el.style.background = "#c8f7c5";   // PASS
+    else if (v >= 288 && v <= 309) el.style.background = "#fff7a8"; // LOW
+    else if (v >= 10 && v <= 287) el.style.background = "#f7c5c5";  // FAIL
+    else el.style.background = "";
+}
+
+function validateCompressor(){
+    const yr = parseFloat(document.getElementById("compYR").value);
+    const yp = parseFloat(document.getElementById("compYP").value);
+    const rpEl = document.getElementById("compRP");
+    const rp = parseFloat(rpEl.value);
+    if (isNaN(rp) || isNaN(yr) || isNaN(yp)) { rpEl.style.background = ""; return; }
+    const sum = yr + yp, min = rp * 0.95, max = rp * 1.05;
+    rpEl.style.background = (sum >= min && sum <= max) ? "#c8f7c5" : "#f7c5c5";
+}
+
+function validateCompGround(id){
+    const el = document.getElementById(id);
+    const v = el.value.trim().toUpperCase();
+    if (v === "") { el.style.background = ""; return; }
+    el.style.background = (v === "OL") ? "#c8f7c5" : "#f7c5c5";
+}
+
+function validateEXV(id,min,max){
+    const el = document.getElementById(id);
+    const v = parseFloat(el.value);
+    if (isNaN(v)) { el.style.background = ""; return; }
+    el.style.background = (v >= min && v <= max) ? "#c8f7c5" : "#f7c5c5";
+}
 </script>
 
 </body>
